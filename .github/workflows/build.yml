@@ -1,8 +1,8 @@
-name: Build APK
+name: Build Android APK
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
@@ -10,46 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-
-      - name: Generate ic_launcher icons
-        run: |
-          sudo apt-get install -y imagemagick
-          mkdir -p app/src/main/res/mipmap-hdpi
-          mkdir -p app/src/main/res/mipmap-mdpi
-          mkdir -p app/src/main/res/mipmap-xhdpi
-          mkdir -p app/src/main/res/mipmap-xxhdpi
-          convert -size 72x72 xc:'#4285F4' -fill white -font DejaVu-Sans-Bold \
-            -pointsize 40 -gravity Center -annotate 0 'G' \
-            app/src/main/res/mipmap-hdpi/ic_launcher.png
-          convert -size 48x48 xc:'#4285F4' -fill white -font DejaVu-Sans-Bold \
-            -pointsize 28 -gravity Center -annotate 0 'G' \
-            app/src/main/res/mipmap-mdpi/ic_launcher.png
-          convert -size 96x96 xc:'#4285F4' -fill white -font DejaVu-Sans-Bold \
-            -pointsize 54 -gravity Center -annotate 0 'G' \
-            app/src/main/res/mipmap-xhdpi/ic_launcher.png
-          convert -size 144x144 xc:'#4285F4' -fill white -font DejaVu-Sans-Bold \
-            -pointsize 80 -gravity Center -annotate 0 'G' \
-            app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-          cp app/src/main/res/mipmap-hdpi/ic_launcher.png app/src/main/res/mipmap-hdpi/ic_launcher_round.png
-          cp app/src/main/res/mipmap-mdpi/ic_launcher.png app/src/main/res/mipmap-mdpi/ic_launcher_round.png
-          cp app/src/main/res/mipmap-xhdpi/ic_launcher.png app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
-          cp app/src/main/res/mipmap-xxhdpi/ic_launcher.png app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
+          cache: gradle
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
       - name: Build Release APK
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease --stacktrace
 
-      - name: Upload APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: gemini-app
           path: app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
