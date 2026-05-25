@@ -20,7 +20,6 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # השלב הזה נוסף כדי לייצר את האייקונים החסרים
       - name: Generate ic_launcher icons
         run: |
           mkdir -p app/src/main/res/mipmap-anydpi-v26
@@ -34,11 +33,13 @@ jobs:
           echo '<?xml version="1.0" encoding="utf-8"?><vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108"><path android:fillColor="#008577" android:pathData="M0,0h108v108h-108z"/></vector>' > app/src/main/res/mipmap-anydpi-v26/ic_launcher_background.xml
           echo '<?xml version="1.0" encoding="utf-8"?><vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108"><path android:fillColor="#FFFFFF" android:pathData="M54,54m-20,0a20,20 0,1 1,40 0a20,20 0,1 1,-40 0"/></vector>' > app/src/main/res/mipmap-anydpi-v26/ic_launcher_foreground.xml
           
-          touch app/src/main/res/mipmap-hdpi/ic_launcher.png
-          touch app/src/main/res/mipmap-mdpi/ic_launcher.png
-          touch app/src/main/res/mipmap-xhdpi/ic_launcher.png
-          touch app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-          touch app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          # יצירת קבצי תמונה תקניים ושקופים כדי למנוע קריסת קומפילציה
+          BASE64_PNG="iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+          echo $BASE64_PNG | base64 -d > app/src/main/res/mipmap-hdpi/ic_launcher.png
+          echo $BASE64_PNG | base64 -d > app/src/main/res/mipmap-mdpi/ic_launcher.png
+          echo $BASE64_PNG | base64 -d > app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          echo $BASE64_PNG | base64 -d > app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          echo $BASE64_PNG | base64 -d > app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
